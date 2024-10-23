@@ -1,0 +1,230 @@
+<html><head><base href="https://filipino-names.websim.net/">
+<meta charset="UTF-8">
+<title>Filipino Name Generator with Trivia</title>
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, 
+            #0038A8 0%,
+            #CE1126 50%,
+            #FCD116 100%
+        );
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        width: 90%;
+        text-align: center;
+    }
+
+    h1 {
+        color: #0038A8;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+
+    .name-display {
+        font-size: 2em;
+        color: #2c3e50;
+        margin: 20px 0;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button {
+        background: #CE1126;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    button:hover {
+        background: #a50d1f;
+        transform: scale(1.05);
+    }
+
+    .name-type {
+        margin: 20px 0;
+    }
+
+    input[type="radio"] {
+        display: none;
+    }
+
+    .radio-label {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 0 10px;
+        background: #f1f1f1;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    input[type="radio"]:checked + .radio-label {
+        background: #0038A8;
+        color: white;
+    }
+
+    .meaning {
+        font-style: italic;
+        color: #666;
+        margin-top: 10px;
+        min-height: 40px;
+    }
+
+    .trivia-box {
+        background: #f8f9fa;
+        border-left: 4px solid #FCD116;
+        padding: 15px;
+        margin-top: 20px;
+        text-align: left;
+        border-radius: 5px;
+        display: none; /* Hidden by default */
+        animation: slideDown 0.5s ease-out;
+    }
+
+    .trivia-title {
+        color: #0038A8;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Filipino Name Generator</h1>
+        <div class="name-type">
+            <input type="radio" id="male" name="gender" value="male" checked>
+            <label class="radio-label" for="male">Male</label>
+            <input type="radio" id="female" name="gender" value="female">
+            <label class="radio-label" for="female">Female</label>
+        </div>
+        <div class="name-display" id="generatedName">Click generate to start!</div>
+        <div class="meaning" id="nameMeaning"></div>
+        <div class="trivia-box" id="triviaBox">
+            <div class="trivia-title">📚 Name Trivia:</div>
+            <div id="triviaContent"></div>
+        </div>
+        <button id="generateBtn">Generate Name</button>
+    </div>
+
+<script>
+const maleNames = {
+    "Agapito": {
+        meaning: "Beloved",
+        trivia: "Derived from the Greek 'agape', meaning unconditional love. Common in Spanish-influenced Filipino families."
+    },
+    "Bayani": {
+        meaning: "Hero",
+        trivia: "A truly Filipino name that embodies the courageous spirit of the nation. Often given to children born during significant historical events."
+    },
+    "Crisanto": {
+        meaning: "Golden Christ",
+        trivia: "Popular during Spanish colonial times, combining 'Cristo' (Christ) and 'santo' (saint). Often celebrated on November 25th."
+    },
+    "Dakila": {
+        meaning: "Great, Noble",
+        trivia: "An ancient Tagalog word that represents greatness. Was commonly used among pre-colonial Filipino nobility."
+    },
+    "Fernando": {
+        meaning: "Adventurous",
+        trivia: "One of the most enduring Spanish names in Filipino culture, associated with many local leaders and artists."
+    }
+};
+
+const femaleNames = {
+    "Amihan": {
+        meaning: "North Wind",
+        trivia: "In Philippine mythology, Amihan is the north wind deity. The name is also associated with the winter monsoon season."
+    },
+    "Bituin": {
+        meaning: "Star",
+        trivia: "A poetic Tagalog name often given to children born at night. Popular among indigenous Filipino families."
+    },
+    "Corazon": {
+        meaning: "Heart",
+        trivia: "Made famous by former Philippine President Corazon Aquino, the first female president in Asia."
+    },
+    "Dalisay": {
+        meaning: "Pure",
+        trivia: "A traditional Tagalog name representing purity and honesty. Often used in classical Filipino literature."
+    },
+    "Ligaya": {
+        meaning: "Happiness",
+        trivia: "A name that embodies the naturally joyful spirit of Filipino culture. Popular during the Philippine Commonwealth period."
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generateBtn');
+    
+    generateBtn.addEventListener('click', function() {
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        const names = gender === 'male' ? maleNames : femaleNames;
+        const namesList = Object.entries(names);
+        const randomIndex = Math.floor(Math.random() * namesList.length);
+        const [name, details] = namesList[randomIndex];
+        
+        const nameDisplay = document.getElementById('generatedName');
+        const meaningDisplay = document.getElementById('nameMeaning');
+        const triviaBox = document.getElementById('triviaBox');
+        const triviaContent = document.getElementById('triviaContent');
+        
+        // Update content
+        nameDisplay.textContent = name;
+        meaningDisplay.textContent = `Meaning: ${details.meaning}`;
+        triviaContent.textContent = details.trivia;
+        
+        // Show trivia box
+        triviaBox.style.display = 'block';
+        
+        // Reset and trigger animations
+        nameDisplay.style.animation = 'none';
+        triviaBox.style.animation = 'none';
+        nameDisplay.offsetHeight; // Trigger reflow
+        triviaBox.offsetHeight; // Trigger reflow
+        nameDisplay.style.animation = 'fadeInUp 0.5s ease-out';
+        triviaBox.style.animation = 'slideDown 0.5s ease-out';
+    });
+});
+</script>
+</body></html>
